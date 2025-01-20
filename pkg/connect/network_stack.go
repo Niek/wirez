@@ -93,7 +93,7 @@ func (s *NetworkStack) SetupRouting(nic tcpip.NICID, assignNet string) error {
 		return fmt.Errorf("unable to ParseCIDR(%s): %w", assignNet, err)
 	}
 
-	subnet, err := tcpip.NewSubnet(tcpip.Address(ipNet.IP), tcpip.AddressMask(ipNet.Mask))
+	subnet, err := tcpip.NewSubnet(tcpip.AddrFromSlice(ipNet.IP), tcpip.MaskFromBytes(ipNet.Mask))
 	if err != nil {
 		return fmt.Errorf("unable to NewSubnet(%s): %w", ipNet, err)
 	}
@@ -145,7 +145,7 @@ func (s *NetworkStack) setUDPHandler() {
 			return
 		}
 		go func() {
-			if err := s.handleUDP(gonet.NewUDPConn(s.Stack, &wq, ep), &id); err != nil {
+			if err := s.handleUDP(gonet.NewUDPConn(&wq, ep), &id); err != nil {
 				s.log.Error().Str("handler", "udp").Err(err).Msg("")
 			}
 		}()
